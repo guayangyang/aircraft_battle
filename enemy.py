@@ -36,7 +36,10 @@ class SmallEnemy(Sprite):
         #else:
             #self.pos_x -= 5
         self.rect.y = self.pos_y
-        self.rect.x = self.pos_x
+        #self.rect.x = self.pos_x
         
     def draw_enemy(self):
         self.screen.blit(self.enemy1, self.rect)
+        
+
+    

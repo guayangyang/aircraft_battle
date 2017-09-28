@@ -74,6 +74,38 @@ def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadi
     #new_bullet = Bullet(settings, screen, ship)
     #bullets.add(new_bullet)
        
+    
+def update_bullets(bullets):
+    for bullet in bullets.sprites():
+        bullet.update_bullet_pos()
+        bullet.draw_bullet()
+            
+    for bullet in bullets.copy():
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
+            
+    
+            
+def update_small_enemys(small_enemys, bullets, screen):
+    for small_enemy in small_enemys.sprites():
+        small_enemy.update_enemy_pos()
+        small_enemy.draw_enemy()
+            
+    for small_enemy in small_enemys.copy():
+        if small_enemy.rect.y > 720 or small_enemy.rect.x < 0 or small_enemy.rect.x > 1280:
+            small_enemys.remove(small_enemy)
+            
+    for small_enemy in small_enemys.copy(): 
+        if pygame.sprite.groupcollide(bullets, small_enemys, False, pygame.sprite.collide_mask):
+            screen.blit(pygame.image.load('Resources/UI/enemy1_down1.png'), small_enemy.rect)
+    
+            screen.blit(pygame.image.load('Resources/UI/enemy1_down2.png'), small_enemy.rect)
+   
+            screen.blit(pygame.image.load('Resources/UI/enemy1_down3.png'), small_enemy.rect)
+    
+            screen.blit(pygame.image.load('Resources/UI/enemy1_down4.png'), small_enemy.rect)
+      
+            small_enemys.remove(small_enemy)
             
             
             

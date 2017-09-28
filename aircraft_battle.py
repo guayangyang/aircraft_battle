@@ -126,38 +126,18 @@ while True:
             
         gameMap1.map_rolling()
         gameMap2.map_rolling()
-        #pygame.display.update()
+
+
         ship.update_ship_pos()
         ship.draw_ship()
-        #bullet.update_bullet_pos()
-        #bullet.draw_bullet()
-        #if len(bullets) < 5:
-            #new_bullet = Bullet(settings, screen, ship)
-            #bullets.add(new_bullet)
-        #gf.add_bullet(settings, screen, ship, bullets)
+
+        
+        gf.update_bullets(bullets)
+        gf.update_small_enemys(small_enemys, bullets, screen)
+        
         
 
             
-    
-        bullets.update()
-        for bullet in bullets.sprites():
-            bullet.update_bullet_pos()
-            bullet.draw_bullet()
-            
-        for bullet in bullets.copy():
-            if bullet.rect.bottom <= 0:
-                bullets.remove(bullet)
-                
-        small_enemys.update()
-        for small_enemy in small_enemys.sprites():
-            small_enemy.update_enemy_pos()
-            small_enemy.draw_enemy()
-            
-        for small_enemy in small_enemys.copy():
-            if small_enemy.rect.y > 720 or small_enemy.rect.x < 0 or small_enemy.rect.x > 1280:
-                small_enemys.remove(small_enemy)
-        
-       # gameStatus.game_start_flag = False
     pygame.display.update()
     
 
