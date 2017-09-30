@@ -65,7 +65,7 @@ def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadi
             screen.blit(background.subsurface(loading_pos, (loading1_width, loadig1_height)), loading_pos)
             screen.blit(game_loading, loading_pos)
             pygame.display.update()
-            time.sleep(0.5)
+            time.sleep(0.1)
     gameStatus.start_animation_flag = False
     screen.set_clip(0, 0, settings.screen_width, settings.screen_height)   
             
@@ -75,7 +75,7 @@ def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadi
     #bullets.add(new_bullet)
        
     
-def update_bullets(bullets):
+def update_bullets(bullets, screen, small_enemys, delay):
     for bullet in bullets.sprites():
         bullet.update_bullet_pos()
         bullet.draw_bullet()
@@ -83,10 +83,16 @@ def update_bullets(bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-            
-    
-            
-def update_small_enemys(small_enemys, bullets, screen):
+    """
+    for bullet in bullets:
+        enemy_hit = pygame.sprite.spritecollide(bullet, small_enemys, False, pygame.sprite.collide_mask)        
+        if enemy_hit:
+            for small_enemy in small_enemys.sprites:
+                if not(delay%3):
+                    screen.blit(small_enemy.enemy1_list[small_enemy.enemy1_list_index], small_enemy.rect)
+                    small_enemy.enemy1_list_index = (small_enemy.enemy1_list_index+1)%4
+    """                   
+def update_small_enemys(small_enemys, bullets, screen, frame_count, delay):
     for small_enemy in small_enemys.sprites():
         small_enemy.update_enemy_pos()
         small_enemy.draw_enemy()
@@ -94,18 +100,32 @@ def update_small_enemys(small_enemys, bullets, screen):
     for small_enemy in small_enemys.copy():
         if small_enemy.rect.y > 720 or small_enemy.rect.x < 0 or small_enemy.rect.x > 1280:
             small_enemys.remove(small_enemy)
-            
+    """        
     for small_enemy in small_enemys.copy(): 
-        if pygame.sprite.groupcollide(bullets, small_enemys, False, pygame.sprite.collide_mask):
-            screen.blit(pygame.image.load('Resources/UI/enemy1_down1.png'), small_enemy.rect)
-    
-            screen.blit(pygame.image.load('Resources/UI/enemy1_down2.png'), small_enemy.rect)
+        
+        if pygame.sprite.groupcollide(bullets, small_enemys, True, False):
+            #screen.blit(pygame.image.load('Resources/UI/enemy1_down1.png'), small_enemy.rect)
+
+            #screen.blit(pygame.image.load('Resources/UI/enemy1_down2.png'), small_enemy.rect)
    
-            screen.blit(pygame.image.load('Resources/UI/enemy1_down3.png'), small_enemy.rect)
+            #screen.blit(pygame.image.load('Resources/UI/enemy1_down3.png'), small_enemy.rect)
     
-            screen.blit(pygame.image.load('Resources/UI/enemy1_down4.png'), small_enemy.rect)
-      
+            #screen.blit(pygame.image.load('Resources/UI/enemy1_down4.png'), small_enemy.rect)
+            screen.blit(small_enemy.enemy1_list[small_enemy.enemy1_list_index], small_enemy.rect)
+            frame_count += 1
+            if frame_count == 60:
+                frame_count = 0
+                small_enemy.enemy1_list_index += 1
+        if small_enemy.enemy1_list_index == 4:
+            small_enemy.kill()
             small_enemys.remove(small_enemy)
-            
-            
-            
+    """        
+        
+    
+    for small_enemy in small_enemys: 
+        if pygame.sprite.groupcollide(bullets, small_enemys, pygame.sprite.collide_mask, True):
+            if not(delay%3):
+                screen.blit(small_enemy.enemy1_list[small_enemy.enemy1_list_index], small_enemy.rect)
+                small_enemy.enemy1_list_index = (small_enemy.enemy1_list_index+1)%4
+     
+# pygame.sprite.collide_mask          

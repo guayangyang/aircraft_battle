@@ -22,4 +22,4 @@ class Settings():
         # bullet1 setting
         self.bullet1_speed_factor = 10
         
-        self.enemy1_speed_factor = 5
+        self.enemy1_speed_factor = 2

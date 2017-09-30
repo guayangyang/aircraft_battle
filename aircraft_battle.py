@@ -86,7 +86,8 @@ game_over_button = Button(game_over, game_overDown, (settings.screen_width/2, 66
 
 clock = pygame.time.Clock()
 i = 0
-
+frame_count = 0
+delay = 100
 bullet_interval = USEREVENT
 pygame.time.set_timer(bullet_interval, int(0.2*1000))
 small_enemy_interval = USEREVENT+1
@@ -132,13 +133,17 @@ while True:
         ship.draw_ship()
 
         
-        gf.update_bullets(bullets)
-        gf.update_small_enemys(small_enemys, bullets, screen)
+        gf.update_bullets(bullets, screen, small_enemys, delay)
+        gf.update_small_enemys(small_enemys, bullets, screen, frame_count, delay)
         
+        delay -= 1
         
+        if not delay:
+            delay=100
 
             
-    pygame.display.update()
+    #pygame.display.update()
+    pygame.display.flip()
     
 
     

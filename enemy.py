@@ -16,6 +16,12 @@ class SmallEnemy(Sprite):
         
         # Load the small enemy image, and get its rect.
         self.enemy1 = pygame.image.load('Resources/UI/enemy1.png')
+        self.enemy1_list = []
+        self.enemy1_list.append(pygame.image.load('Resources/UI/enemy1_down1.png'))
+        self.enemy1_list.append(pygame.image.load('Resources/UI/enemy1_down2.png'))
+        self.enemy1_list.append(pygame.image.load('Resources/UI/enemy1_down3.png'))
+        self.enemy1_list.append(pygame.image.load('Resources/UI/enemy1_down4.png'))
+        self.enemy1_list_index = 0
         self.rect = self.enemy1.get_rect()
         self.settings = settings
         self.screen = screen
