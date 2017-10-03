@@ -20,8 +20,8 @@ class Ship():
         self.image = pygame.image.load('Resources/UI/ship.png')
         self.image_width, self.image_height = self.image.get_size()
         self.ship = pygame.transform.smoothscale(self.image, 
-                                                 (int(self.image_width//1.5), 
-                                                  int(self.image_height//1.5)))
+                                                 (int(self.image_width//1), 
+                                                  int(self.image_height//1)))
         self.rect = self.ship.get_rect()
         self.screen_rect = self.screen.get_rect()
 
@@ -49,16 +49,16 @@ class Ship():
         """Update the ship's position, based on movement flags."""
         # Update the ship's pos_x and pos_y values, not the rect.
         if self.moving_right and (self.rect.right < self.screen_rect.right):
-            self.pos_x += self.settings.ship_speed_factor
+            self.pos_x += self.settings.ship_speed
             self.moving_right = False
         if self.moving_left and (self.rect.left > 0):
-            self.pos_x -= self.settings.ship_speed_factor
+            self.pos_x -= self.settings.ship_speed
             self.moving_left = False
         if self.moving_up and (self.rect.top > 0):
-            self.pos_y -= self.settings.ship_speed_factor
+            self.pos_y -= self.settings.ship_speed
             self.moving_up = False
         if self.moving_down and (self.rect.bottom < self.screen_rect.bottom):
-            self.pos_y += self.settings.ship_speed_factor
+            self.pos_y += self.settings.ship_speed
             self.moving_down = False
             
         # Update rect object from self.pos_x and self.pos_y.

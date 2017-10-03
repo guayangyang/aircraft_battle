@@ -37,7 +37,10 @@ gameMap2 = GameMap(0, -settings.screen_height, settings, screen)
 ship = Ship(settings, screen)
 # build an bullet
 bullets = Group()
-small_enemys = Group()
+small_enemies = Group()
+middle_enemies = Group()
+big_enemies = Group()
+
 #bullet = Bullet(settings, screen, ship)
 # set name of the screen
 pygame.display.set_caption("Aircraft Battle")
@@ -85,18 +88,27 @@ game_setting_button = Button(game_setting, game_settingDown, (settings.screen_wi
 game_over_button = Button(game_over, game_overDown, (settings.screen_width/2, 660), screen)
 
 clock = pygame.time.Clock()
-i = 0
-frame_count = 0
+
+
+
+# delay for animation
 delay = 100
+
 bullet_interval = USEREVENT
 pygame.time.set_timer(bullet_interval, int(0.2*1000))
 small_enemy_interval = USEREVENT+1
 pygame.time.set_timer(small_enemy_interval, int(1*1000))
+small_enemy_interval = USEREVENT+2
+pygame.time.set_timer(small_enemy_interval, int(5*1000))
+small_enemy_interval = USEREVENT+3
+pygame.time.set_timer(small_enemy_interval, int(10*1000))
+
 
 while True:
-    gf.check_events(game_start_button, game_score_button, game_setting_button, 
+    gf.check_events(game_start_button, game_score_button, game_setting_button,
                     game_over_button, ship, gameStatus, settings, screen, 
-                    bullets, small_enemys, USEREVENT)
+                    bullets, small_enemies, middle_enemies, big_enemies, 
+                    USEREVENT)
      
     #screen.fill(settings.screen_background_color)
     """game_functions.update_screen()""" 
@@ -111,8 +123,8 @@ while True:
     game_over_button.show_image()
 
 
-    time_passed = clock.tick(60)
-    time_passed_seconds = time_passed / 1000.0
+    #time_passed = clock.tick(60)
+    #time_passed_seconds = time_passed / 1000.0
     
     if gameStatus.game_start_flag:
         if gameStatus.start_animation_flag:
@@ -133,17 +145,17 @@ while True:
         ship.draw_ship()
 
         
-        gf.update_bullets(bullets, screen, small_enemys, delay)
-        gf.update_small_enemys(small_enemys, bullets, screen, frame_count, delay)
+        gf.update_bullets(bullets, small_enemies, middle_enemies,
+                          big_enemies)
+        gf.update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay)
         
         delay -= 1
         
         if not delay:
             delay=100
-
-            
-    #pygame.display.update()
-    pygame.display.flip()
-    
+       
+    pygame.display.update()
+    #pygame.display.flip()
+    time_passed = clock.tick(60)
 
     

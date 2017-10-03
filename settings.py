@@ -17,9 +17,12 @@ class Settings():
         self.screen_background_color = (230, 230, 230)
         
         # ship setting
-        self.ship_speed_factor = 8
+        self.ship_speed = 8
         
         # bullet1 setting
-        self.bullet1_speed_factor = 10
+        self.bullet1_speed = 10
         
-        self.enemy1_speed_factor = 2
+        # enemy setting
+        self.smallEnemy_speed = 3
+        self.middleEnemy_speed = 2
+        self.bigEnemy_speed = 1

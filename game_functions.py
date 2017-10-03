@@ -6,12 +6,14 @@ Created on Sun Sep 24 22:56:07 2017
 """
 import sys, pygame
 from bullet import Bullet
-from enemy import SmallEnemy
+from enemy import SmallEnemy, MiddleEnemy, BigEnemy
 import time
 from threading import Timer
 
-def check_events(game_start_button, game_score_button, game_setting_button, game_over_button, ship, gameStatus, settings, screen, bullets, small_enemys, USEREVENT):
-    #global game_start_flag
+# check events
+def check_events(game_start_button, game_score_button, game_setting_button,
+                 game_over_button, ship, gameStatus, settings, screen, bullets,
+                 small_enemies, middle_enemies, big_enemies, USEREVENT):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -28,21 +30,26 @@ def check_events(game_start_button, game_score_button, game_setting_button, game
             new_bullet = Bullet(settings, screen, ship)
             bullets.add(new_bullet)
         elif event.type == USEREVENT+1 and gameStatus.game_start_flag:
-            small_enemy = SmallEnemy(settings, screen)
-            small_enemys.add(small_enemy)
+            for i in range(3):
+                small_enemy = SmallEnemy(settings, screen)
+                small_enemies.add(small_enemy)
+        elif event.type == USEREVENT+2 and gameStatus.game_start_flag:
+            middle_enemy = MiddleEnemy(settings, screen)
+            middle_enemies.add(middle_enemy)
+        elif event.type == USEREVENT+3 and gameStatus.game_start_flag:
+            big_enemy = BigEnemy(settings, screen)
+            big_enemies.add(big_enemy)
     # check keyboard state
-    check_keys_states(ship)
+    check_keys_states(ship, gameStatus)
     
-    
-def check_keys_states(ship):    
-    #ship.moving_right = False
-    #ship.moving_left = False
-    #ship.moving_up = False
-    #ship.moving_down = False        
+# check keyboard state    
+def check_keys_states(ship, gameStatus):           
     keys = pygame.key.get_pressed()
     if keys[pygame.K_ESCAPE]:
         pygame.quit()
         sys.exit()
+    #if keys[pygame.K_RETURN]:
+        #gameStatus.game_start_flag = True
     if keys[pygame.K_UP] or keys[pygame.K_w]:
         ship.moving_up = True
     if keys[pygame.K_DOWN] or keys[pygame.K_s]:
@@ -51,11 +58,6 @@ def check_keys_states(ship):
         ship.moving_left = True
     if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         ship.moving_right = True
-    """
-    if keys[pygame.K_SPACE]:
-        new_bullet = Bullet(settings, screen, ship)
-        bullets.add(new_bullet)
-    """
     
 #def load__start_animation():
 def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadings, settings, gameStatus, screen, background):
@@ -68,64 +70,76 @@ def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadi
             time.sleep(0.1)
     gameStatus.start_animation_flag = False
     screen.set_clip(0, 0, settings.screen_width, settings.screen_height)   
-            
- 
-
-    #new_bullet = Bullet(settings, screen, ship)
-    #bullets.add(new_bullet)
-       
-    
-def update_bullets(bullets, screen, small_enemys, delay):
-    for bullet in bullets.sprites():
-        bullet.update_bullet_pos()
-        bullet.draw_bullet()
-            
+                  
+# update bullets' location and draw them, check if the bullet shots the enemy    
+def update_bullets(bullets, small_enemies, middle_enemies, big_enemies):
+    for bullet in bullets:
+        if bullet.active:
+            bullet.update_bullet_pos()
+            bullet.draw_bullet()
+            # check the bullet sprite shots the small_enemies sprites
+            small_enemy_hit = pygame.sprite.spritecollide(bullet, small_enemies, False, pygame.sprite.collide_mask)        
+            if small_enemy_hit:
+                # when hitting, remove the bullet sprite
+                bullets.remove(bullet)
+                for enemy in small_enemy_hit:
+                    #enemy.hit = True
+                    enemy.hit_point -= 1
+                    if enemy.hit_point == 0:
+                        enemy.active = False
+            # check the bullet sprite shots the small_enemies sprites
+            middle_enemy_hit = pygame.sprite.spritecollide(bullet, middle_enemies, False, pygame.sprite.collide_mask)        
+            if middle_enemy_hit:
+                # when hitting, remove the bullet sprite
+                bullets.remove(bullet)
+                for enemy in middle_enemy_hit:
+                    enemy.hit = True
+                    enemy.hit_point -= 1
+                    if enemy.hit_point == 0:
+                        enemy.active = False
+            big_enemy_hit = pygame.sprite.spritecollide(bullet, big_enemies, False, pygame.sprite.collide_mask)        
+            if big_enemy_hit:
+                # when hitting, remove the bullet sprite
+                bullets.remove(bullet)
+                for enemy in big_enemy_hit:
+                    enemy.hit = True
+                    enemy.hit_point -= 1
+                    if enemy.hit_point == 0:
+                        enemy.active = False
+    # remove dispeared bullets                
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    """
-    for bullet in bullets:
-        enemy_hit = pygame.sprite.spritecollide(bullet, small_enemys, False, pygame.sprite.collide_mask)        
-        if enemy_hit:
-            for small_enemy in small_enemys.sprites:
-                if not(delay%3):
-                    screen.blit(small_enemy.enemy1_list[small_enemy.enemy1_list_index], small_enemy.rect)
-                    small_enemy.enemy1_list_index = (small_enemy.enemy1_list_index+1)%4
-    """                   
-def update_small_enemys(small_enemys, bullets, screen, frame_count, delay):
-    for small_enemy in small_enemys.sprites():
-        small_enemy.update_enemy_pos()
-        small_enemy.draw_enemy()
-            
-    for small_enemy in small_enemys.copy():
-        if small_enemy.rect.y > 720 or small_enemy.rect.x < 0 or small_enemy.rect.x > 1280:
-            small_enemys.remove(small_enemy)
-    """        
-    for small_enemy in small_enemys.copy(): 
-        
-        if pygame.sprite.groupcollide(bullets, small_enemys, True, False):
-            #screen.blit(pygame.image.load('Resources/UI/enemy1_down1.png'), small_enemy.rect)
 
-            #screen.blit(pygame.image.load('Resources/UI/enemy1_down2.png'), small_enemy.rect)
-   
-            #screen.blit(pygame.image.load('Resources/UI/enemy1_down3.png'), small_enemy.rect)
-    
-            #screen.blit(pygame.image.load('Resources/UI/enemy1_down4.png'), small_enemy.rect)
-            screen.blit(small_enemy.enemy1_list[small_enemy.enemy1_list_index], small_enemy.rect)
-            frame_count += 1
-            if frame_count == 60:
-                frame_count = 0
-                small_enemy.enemy1_list_index += 1
-        if small_enemy.enemy1_list_index == 4:
-            small_enemy.kill()
-            small_enemys.remove(small_enemy)
-    """        
-        
-    
-    for small_enemy in small_enemys: 
-        if pygame.sprite.groupcollide(bullets, small_enemys, pygame.sprite.collide_mask, True):
-            if not(delay%3):
-                screen.blit(small_enemy.enemy1_list[small_enemy.enemy1_list_index], small_enemy.rect)
-                small_enemy.enemy1_list_index = (small_enemy.enemy1_list_index+1)%4
-     
-# pygame.sprite.collide_mask          
+
+
+def update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay):
+    update_enemies(small_enemies, screen, delay, 5)
+    update_enemies(middle_enemies, screen, delay, 5)
+    update_enemies(big_enemies, screen, delay, 8)
+            
+def update_enemies(enemies, screen, delay, num_frames):
+    for enemy in enemies.sprites():
+        # hitting enemy
+        if enemy.hit:
+            enemy.draw_enemy_hit()
+            enemy.hit = False
+        # active enemy
+        if enemy.active:
+            enemy.update_enemy_pos()
+            enemy.draw_enemy()
+        # crashed enemy
+        else:
+            # every 5 frames as one picture of the crashed enemy's animation
+            if not(delay% num_frames):
+                        screen.blit(enemy.image_group[enemy.image_group_index], enemy.rect)
+                        enemy.image_group_index = (enemy.image_group_index+1) % len(enemy.image_group) 
+                        # when the crash animation done, remove the enemy sprite
+                        if enemy.image_group_index == 0:
+                            enemies.remove(enemy)
+                  
+    for enemy in enemies.copy():
+        if enemy.rect.y > 720 or enemy.rect.x < 0 or enemy.rect.x > 1280:
+            enemies.remove(enemy)
+                            
+ 

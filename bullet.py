@@ -21,6 +21,7 @@ class Bullet(Sprite):
         
         # Load the bullet image, and get its rect.
         self.bullet1 = pygame.image.load('Resources/UI/bullet1.png')
+        self.image = self.bullet1
         self.rect = self.bullet1.get_rect()
         self.screen_rect = self.screen.get_rect()
 
@@ -31,12 +32,15 @@ class Bullet(Sprite):
         # Store a decimal value for the bullet's position.
         self.pos_x = float(self.rect.centerx)
         self.pos_y = float(self.rect.top)
+        
+        self.active = True
+        self.mask=pygame.mask.from_surface(self.image)
 
 
     def update_bullet_pos(self):
         """Move the bullet up the screen."""
         # Update the decimal position of the bullet.
-        self.pos_y -= self.settings.bullet1_speed_factor
+        self.pos_y -= self.settings.bullet1_speed
         self.rect.top = self.pos_y
         
         
