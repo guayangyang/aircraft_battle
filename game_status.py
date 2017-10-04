@@ -9,6 +9,7 @@ class GameStatus():
     """a class of tracking game status and information"""
     def __init__(self):
         """flags in game"""
+        self.game_active = True
         self.game_start_flag = False
         self.game_score_flag = False
         self.game_setting_flag = False

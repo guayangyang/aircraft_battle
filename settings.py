@@ -18,6 +18,7 @@ class Settings():
         
         # ship setting
         self.ship_speed = 8
+        self.ship_lives = 3
         
         # bullet1 setting
         self.bullet1_speed = 10
@@ -25,4 +26,4 @@ class Settings():
         # enemy setting
         self.smallEnemy_speed = 3
         self.middleEnemy_speed = 2
-        self.bigEnemy_speed = 1
+        self.bigEnemy_speed = 0.1

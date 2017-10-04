@@ -15,6 +15,7 @@ class Ship():
         #super().__init__()
         self.screen = screen
         self.settings = settings
+        self.lives = settings.ship_lives
 
         # Load the ship image, and get its rect.
         self.image = pygame.image.load('Resources/UI/ship.png')
@@ -24,26 +25,42 @@ class Ship():
                                                   int(self.image_height//1)))
         self.rect = self.ship.get_rect()
         self.screen_rect = self.screen.get_rect()
+        
+        # load the explosion image group
+        self.image_group = []
+        self.image_group_index = 0
+        self.image_group.append(pygame.image.load('Resources/UI/hero_blowup_n1.png').convert_alpha())
+        self.image_group.append(pygame.image.load('Resources/UI/hero_blowup_n2.png').convert_alpha())
+        self.image_group.append(pygame.image.load('Resources/UI/hero_blowup_n3.png').convert_alpha())
+        self.image_group.append(pygame.image.load('Resources/UI/hero_blowup_n4.png').convert_alpha())
+
+        
+        
 
         # Start each new ship at the bottom center of the screen.
-        self.rect.centerx = self.screen_rect.centerx
-        self.rect.bottom = self.screen_rect.bottom
-        
-        # Store decimal values for the ship's coordinates.
-        self.pos_x = float(self.rect.centerx)
-        #self.pos_y = float(self.rect.bottom)
-        self.pos_y = float(self.rect.y)
+        self.init_ship()
         # Movement flags.
         self.moving_right = False
         self.moving_left = False
         self.moving_up = False
         self.moving_down = False
+        self.active = True
+        self.born = False
+        # set mask
+        self.mask = pygame.mask.from_surface(self.image)
         
-    def load_ship(self):
+    def init_ship(self):
         """load the ship on the screen when
            the game begins or the ship is crashed """
-        self.pos_x = self.screen_rect.centerx
-        self.pos_y = self.screen_rect.bottom
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.bottom = self.screen_rect.bottom
+        # Store decimal values for the ship's coordinates.
+        self.pos_x = float(self.rect.centerx)
+        #self.pos_y = float(self.rect.bottom)
+        self.pos_y = float(self.rect.y)
+        self.active = True
+        self.born = True
+        
         
     def update_ship_pos(self):
         """Update the ship's position, based on movement flags."""

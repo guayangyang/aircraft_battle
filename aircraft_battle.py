@@ -98,17 +98,19 @@ bullet_interval = USEREVENT
 pygame.time.set_timer(bullet_interval, int(0.2*1000))
 small_enemy_interval = USEREVENT+1
 pygame.time.set_timer(small_enemy_interval, int(1*1000))
-small_enemy_interval = USEREVENT+2
-pygame.time.set_timer(small_enemy_interval, int(5*1000))
-small_enemy_interval = USEREVENT+3
-pygame.time.set_timer(small_enemy_interval, int(10*1000))
+middle_enemy_interval = USEREVENT+2
+pygame.time.set_timer(middle_enemy_interval, int(5*1000))
+big_enemy_interval = USEREVENT+3
+pygame.time.set_timer(big_enemy_interval, int(1*1000))
+ship_born_protect = USEREVENT+4
 
 
-while True:
+
+while gameStatus.game_active:
     gf.check_events(game_start_button, game_score_button, game_setting_button,
                     game_over_button, ship, gameStatus, settings, screen, 
                     bullets, small_enemies, middle_enemies, big_enemies, 
-                    USEREVENT)
+                    USEREVENT, ship_born_protect)
      
     #screen.fill(settings.screen_background_color)
     """game_functions.update_screen()""" 
@@ -141,13 +143,15 @@ while True:
         gameMap2.map_rolling()
 
 
-        ship.update_ship_pos()
-        ship.draw_ship()
+        #ship.update_ship_pos()
+        #ship.draw_ship()
 
         
         gf.update_bullets(bullets, small_enemies, middle_enemies,
                           big_enemies)
         gf.update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay)
+        gf.update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect)
+        gf.check_gameover(screen, gameStatus, background)
         
         delay -= 1
         

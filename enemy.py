@@ -5,7 +5,7 @@ Created on Wed Sep 27 23:57:29 2017
 @author: Yang WU
 """
 import pygame
-from random import randint
+from random import randrange, randint
 from pygame.sprite import Sprite
 
 class Enemy(Sprite):
@@ -17,7 +17,7 @@ class Enemy(Sprite):
         self.screen_rect = self.screen.get_rect()
         self.image_group = []
         self.image_group_index = 0
-        self.move_direc = randint(-1, 1)
+        self.move_direc = randrange(-1, 2, 2)
         # set the flag if the enemy is active or crashed
         self.active = True
         # set hit point
@@ -48,11 +48,13 @@ class SmallEnemy(Enemy):
         self.mask=pygame.mask.from_surface(self.image)
 
     # update enemy position
-    def update_enemy_pos(self):
+    def update_enemy_pos(self, screen):
         self.pos_y += self.settings.smallEnemy_speed
         self.pos_x += self.move_direc * self.settings.smallEnemy_speed/5
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
+        if self.rect.y > 720 or self.rect.x < 0 or self.rect.x > 1280:
+            self.init_enemy()
         
     def draw_enemy(self):
         self.screen.blit(self.image, self.rect)
@@ -63,7 +65,7 @@ class SmallEnemy(Enemy):
     # initialize the enemy's position       
     def init_enemy(self):
         self.rect.x = randint(100, 1200)
-        self.rect.y = randint(-800, -20)
+        self.rect.y = randint(-800, -100)
         
 class MiddleEnemy(Enemy):
     """ a class of middle enemy plane """
@@ -91,11 +93,15 @@ class MiddleEnemy(Enemy):
         self.hit_point = 10
 
     # update enemy position
-    def update_enemy_pos(self):
+    def update_enemy_pos(self, screen):
         self.pos_y += self.settings.middleEnemy_speed
         self.pos_x += self.move_direc * self.settings.middleEnemy_speed/3
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
+        if self.rect.left == self.screen_rect.left or self.rect.right == self.screen_rect.right:
+            self.move_direc *= -1
+        if self.rect.y > 720:
+            self.init_enemy()
         
     def draw_enemy(self):
         self.screen.blit(self.image, self.rect)
@@ -106,7 +112,7 @@ class MiddleEnemy(Enemy):
     # initialize the enemy's position       
     def init_enemy(self):
         self.rect.x = randint(100, 1200)
-        self.rect.y = randint(-800, -20)
+        self.rect.y = randint(-800, -100)
         
 class BigEnemy(Enemy):
     """ a class of big enemy plane """
@@ -132,14 +138,18 @@ class BigEnemy(Enemy):
         # set mask
         self.mask=pygame.mask.from_surface(self.image)
         # set hit point
-        self.hit_point = 20
+        self.hit_point = 100
 
     # update enemy position
-    def update_enemy_pos(self):
+    def update_enemy_pos(self, screen):
         self.pos_y += self.settings.bigEnemy_speed
-        self.pos_x += self.move_direc * self.settings.bigEnemy_speed/1
+        self.pos_x += self.move_direc * self.settings.bigEnemy_speed*10
         self.rect.y = self.pos_y
         self.rect.x = self.pos_x
+        if self.rect.left == self.screen_rect.left or self.rect.right == self.screen_rect.right:
+            self.move_direc *= -1
+        if self.rect.y > 720:
+            self.init_enemy()
         
     def draw_enemy(self):
         self.screen.blit(self.image, self.rect)
@@ -150,5 +160,5 @@ class BigEnemy(Enemy):
     # initialize the enemy's position       
     def init_enemy(self):
         self.rect.x = randint(100, 1200)
-        self.rect.y = randint(-800, -20)
+        self.rect.y = randint(-201, -200)
     
