@@ -13,7 +13,9 @@ from threading import Timer
 # check events
 def check_events(game_start_button, game_score_button, game_setting_button,
                  game_over_button, ship, gameStatus, settings, screen, bullets,
-                 small_enemies, middle_enemies, big_enemies, USEREVENT, ship_born_protect):
+                 small_enemies, middle_enemies, big_enemies, bullet_interval,
+                 small_enemy_interval, middle_enemy_interval,
+                 big_enemy_interval, ship_born_protect):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -26,20 +28,20 @@ def check_events(game_start_button, game_score_button, game_setting_button,
             pass
         elif event.type == pygame.MOUSEBUTTONDOWN and game_over_button.is_mouse_over():
             pass
-        elif event.type == USEREVENT and gameStatus.game_start_flag:
+        elif event.type == bullet_interval and gameStatus.game_start_flag:
             new_bullet = Bullet(settings, screen, ship)
             bullets.add(new_bullet)
-        elif event.type == USEREVENT+1 and gameStatus.game_start_flag:
+        elif event.type == small_enemy_interval and gameStatus.game_start_flag:
             small_enemy = SmallEnemy(settings, screen)
             small_enemies.add(small_enemy)
-        elif event.type == USEREVENT+2 and gameStatus.game_start_flag:
+        elif event.type == middle_enemy_interval and gameStatus.game_start_flag:
             middle_enemy = MiddleEnemy(settings, screen)
             middle_enemies.add(middle_enemy)
-        elif event.type == USEREVENT+3 and gameStatus.game_start_flag:
+        elif event.type == big_enemy_interval and gameStatus.game_start_flag:
             if len(big_enemies) < 1:
                 big_enemy = BigEnemy(settings, screen)
                 big_enemies.add(big_enemy)
-        elif event.type == USEREVENT+4:
+        elif event.type == ship_born_protect:
             ship.born = False
             pygame.time.set_timer(ship_born_protect, 0)
     # check keyboard state
@@ -161,16 +163,23 @@ def forbid_enemies_overlap(enemygroup1, enemygroup2):
 
 def update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect):
     check_ship(ship, small_enemies, gameStatus, delay, screen, ship_born_protect)
-    check_ship(ship, middle_enemies, gameStatus, delay, screen, ship_born_protect)
-    check_ship(ship, big_enemies, gameStatus, delay, screen, ship_born_protect)
+    check_ship(ship, middle_enemies, gameStatus, delay, screen, ship_born_protect, False)
+    check_ship(ship, big_enemies, gameStatus, delay, screen, ship_born_protect, False)
 
     
-def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect):
+def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, is_small_enemy = True):
     ship_hit = pygame.sprite.spritecollide(ship, enemygroup, False, pygame.sprite.collide_mask)
     if ship_hit and not ship.born:
         ship.active = False
         for enemy in ship_hit:
-            enemy.active = False
+            if is_small_enemy:
+                enemy.active = False
+            else:
+                enemy.hit = True
+                enemy.hit_point -= 1
+                if enemy.hit_point == 0:
+                    enemy.active = False
+        ship_hit = None
                 
     if ship.active:
         ship.update_ship_pos()

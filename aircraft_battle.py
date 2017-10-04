@@ -101,7 +101,7 @@ pygame.time.set_timer(small_enemy_interval, int(1*1000))
 middle_enemy_interval = USEREVENT+2
 pygame.time.set_timer(middle_enemy_interval, int(5*1000))
 big_enemy_interval = USEREVENT+3
-pygame.time.set_timer(big_enemy_interval, int(1*1000))
+pygame.time.set_timer(big_enemy_interval, int(30*1000))
 ship_born_protect = USEREVENT+4
 
 
@@ -109,8 +109,10 @@ ship_born_protect = USEREVENT+4
 while gameStatus.game_active:
     gf.check_events(game_start_button, game_score_button, game_setting_button,
                     game_over_button, ship, gameStatus, settings, screen, 
-                    bullets, small_enemies, middle_enemies, big_enemies, 
-                    USEREVENT, ship_born_protect)
+                    bullets,small_enemies, middle_enemies, big_enemies, 
+                    bullet_interval, small_enemy_interval, 
+                    middle_enemy_interval, big_enemy_interval,
+                    ship_born_protect)
      
     #screen.fill(settings.screen_background_color)
     """game_functions.update_screen()""" 
