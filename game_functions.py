@@ -15,7 +15,7 @@ def check_events(game_start_button, game_score_button, game_setting_button,
                  game_over_button, ship, gameStatus, settings, screen, bullets,
                  small_enemies, middle_enemies, big_enemies, bullet_interval,
                  small_enemy_interval, middle_enemy_interval,
-                 big_enemy_interval, ship_born_protect):
+                 big_enemy_interval, ship_born_protect, bullet_sound):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -31,6 +31,7 @@ def check_events(game_start_button, game_score_button, game_setting_button,
         elif event.type == bullet_interval and gameStatus.game_start_flag:
             new_bullet = Bullet(settings, screen, ship)
             bullets.add(new_bullet)
+            bullet_sound.play()
         elif event.type == small_enemy_interval and gameStatus.game_start_flag:
             small_enemy = SmallEnemy(settings, screen)
             small_enemies.add(small_enemy)
@@ -118,10 +119,10 @@ def update_bullets(bullets, small_enemies, middle_enemies, big_enemies):
 
 
 
-def update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay):
-    check_enemies(small_enemies, screen, delay, 5)
-    check_enemies(middle_enemies, screen, delay, 5)
-    check_enemies(big_enemies, screen, delay, 15)
+def update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay, enemy1_down_sound, enemy2_down_sound, enemy3_down_sound):
+    check_enemies(small_enemies, screen, delay, 5, enemy1_down_sound)
+    check_enemies(middle_enemies, screen, delay, 5, enemy2_down_sound)
+    check_enemies(big_enemies, screen, delay, 15, enemy3_down_sound)
     """
     forbid_enemies_overlap(small_enemies, small_enemies)
     forbid_enemies_overlap(middle_enemies, middle_enemies)
@@ -130,7 +131,7 @@ def update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay
     forbid_enemies_overlap(small_enemies, big_enemies)
     forbid_enemies_overlap(middle_enemies, big_enemies)
     """        
-def check_enemies(enemies, screen, delay, num_frames):
+def check_enemies(enemies, screen, delay, num_frames, enemy_down_sound):
     for enemy in enemies.sprites():
         # hitting enemy
         if enemy.hit:
@@ -145,6 +146,8 @@ def check_enemies(enemies, screen, delay, num_frames):
             # every 5 frames as one picture of the crashed enemy's animation
             if not(delay% num_frames):
                 screen.blit(enemy.image_group[enemy.image_group_index], enemy.rect)
+                if enemy.image_group_index == 0:
+                    enemy_down_sound.play()
                 enemy.image_group_index = (enemy.image_group_index+1) % len(enemy.image_group) 
                 # when the crash animation done, remove the enemy sprite
                 if enemy.image_group_index == 0:
@@ -161,13 +164,13 @@ def forbid_enemies_overlap(enemygroup1, enemygroup2):
             #enemy2.move_direc *= -1                    
 """ 
 
-def update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect):
-    check_ship(ship, small_enemies, gameStatus, delay, screen, ship_born_protect)
+def update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect, me_down_sound):
+    check_ship(ship, small_enemies, gameStatus, delay, screen, ship_born_protect, me_down_sound)
     check_ship(ship, middle_enemies, gameStatus, delay, screen, ship_born_protect, False)
     check_ship(ship, big_enemies, gameStatus, delay, screen, ship_born_protect, False)
 
     
-def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, is_small_enemy = True):
+def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, me_down_sound, is_small_enemy = True):
     ship_hit = pygame.sprite.spritecollide(ship, enemygroup, False, pygame.sprite.collide_mask)
     if ship_hit and not ship.born:
         ship.active = False
@@ -187,6 +190,8 @@ def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, i
     else:
         if not(delay% 15):
             screen.blit(ship.image_group[ship.image_group_index], ship.rect)
+            if ship.image_group_index == 0:
+                me_down_sound.play()
             ship.image_group_index = (ship.image_group_index+1) % len(ship.image_group) 
             # when the crash animation done, remove the enemy sprite
             if ship.image_group_index == 0:

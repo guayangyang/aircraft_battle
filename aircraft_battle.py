@@ -22,6 +22,8 @@ from pygame.locals import *
 
 # initialization of pygame
 pygame.init()
+# initialization of audios
+pygame.mixer.init()
 # build an instance of class Settings() 
 settings = Settings()
 # acquire an screen object
@@ -45,6 +47,34 @@ big_enemies = Group()
 # set name of the screen
 pygame.display.set_caption("Aircraft Battle")
 #font = pygame.font.Font(None, 18)
+
+#load audio
+#pygame.mixer.music.load('Resources/sound/game_music.ogg')
+#pygame.mixer.music.set_volume(0.2)
+game_music = pygame.mixer.Sound('Resources/sound/game_music.ogg')
+game_music.set_volume(0.05)
+bullet_sound = pygame.mixer.Sound('Resources/sound/bullet.wav')
+bullet_sound.set_volume(0.1)
+bomb_sound = pygame.mixer.Sound('Resources/sound/use_bomb.wav')
+bomb_sound.set_volume(0.2)
+supply_sound = pygame.mixer.Sound('Resources/sound/supply.wav')
+supply_sound.set_volume(0.2)
+get_bomb_sound = pygame.mixer.Sound('Resources/sound/get_bomb.wav')
+get_bomb_sound.set_volume(0.2)
+get_bullet_sound = pygame.mixer.Sound('Resources/sound/get_bullet.wav')
+get_bullet_sound.set_volume(0.2)
+upgrade_sound = pygame.mixer.Sound('Resources/sound/upgrade.wav')
+upgrade_sound.set_volume(0.2)
+enemy3_fly_sound = pygame.mixer.Sound('Resources/sound/enemy3_flying.wav')
+enemy3_fly_sound.set_volume(0.2)
+enemy1_down_sound = pygame.mixer.Sound('Resources/sound/enemy1_down.wav')
+enemy1_down_sound.set_volume(0.5)
+enemy2_down_sound = pygame.mixer.Sound('Resources/sound/enemy2_down.wav')
+enemy2_down_sound.set_volume(0.5)
+enemy3_down_sound = pygame.mixer.Sound('Resources/sound/enemy3_down.wav')
+enemy3_down_sound.set_volume(0.5)
+me_down_sound = pygame.mixer.Sound('Resources/sound/me_down.wav')
+me_down_sound.set_volume(0.2)
 
 #
 background = pygame.image.load('Resources/UI/background.png').convert_alpha()
@@ -107,12 +137,13 @@ ship_born_protect = USEREVENT+4
 
 
 while gameStatus.game_active:
+    
     gf.check_events(game_start_button, game_score_button, game_setting_button,
                     game_over_button, ship, gameStatus, settings, screen, 
                     bullets,small_enemies, middle_enemies, big_enemies, 
                     bullet_interval, small_enemy_interval, 
                     middle_enemy_interval, big_enemy_interval,
-                    ship_born_protect)
+                    ship_born_protect, bullet_sound)
      
     #screen.fill(settings.screen_background_color)
     """game_functions.update_screen()""" 
@@ -131,6 +162,7 @@ while gameStatus.game_active:
     #time_passed_seconds = time_passed / 1000.0
     
     if gameStatus.game_start_flag:
+        
         if gameStatus.start_animation_flag:
             gf.load_start_animation(loading_pos, loading1_width, 
                                     loadig1_height, game_loadings, 
@@ -151,8 +183,8 @@ while gameStatus.game_active:
         
         gf.update_bullets(bullets, small_enemies, middle_enemies,
                           big_enemies)
-        gf.update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay)
-        gf.update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect)
+        gf.update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay, enemy1_down_sound, enemy2_down_sound, enemy3_down_sound)
+        gf.update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect, me_down_sound)
         gf.check_gameover(screen, gameStatus, background)
         
         delay -= 1
@@ -163,5 +195,5 @@ while gameStatus.game_active:
     pygame.display.update()
     #pygame.display.flip()
     time_passed = clock.tick(60)
-
+    game_music.play()
     
