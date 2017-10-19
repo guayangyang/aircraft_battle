@@ -16,7 +16,7 @@ from button import Button
 from game_status import GameStatus
 from game_map import GameMap
 from ship import Ship
-from bullet import Bullet
+#from bullet import Bullet1
 from pygame.sprite import Group
 from pygame.locals import *
 
@@ -39,6 +39,8 @@ gameMap2 = GameMap(0, -settings.screen_height, settings, screen)
 ship = Ship(settings, screen)
 # build an bullet
 bullets = Group()
+bulletAmmos = Group()
+bombAmmos = Group()
 small_enemies = Group()
 middle_enemies = Group()
 big_enemies = Group()
@@ -48,11 +50,12 @@ big_enemies = Group()
 pygame.display.set_caption("Aircraft Battle")
 #font = pygame.font.Font(None, 18)
 
+score_font = pygame.font.Font('Resources/font/font.ttf',36)
 #load audio
 #pygame.mixer.music.load('Resources/sound/game_music.ogg')
 #pygame.mixer.music.set_volume(0.2)
 game_music = pygame.mixer.Sound('Resources/sound/game_music.ogg')
-game_music.set_volume(0.05)
+game_music.set_volume(0.2)
 bullet_sound = pygame.mixer.Sound('Resources/sound/bullet.wav')
 bullet_sound.set_volume(0.1)
 bomb_sound = pygame.mixer.Sound('Resources/sound/use_bomb.wav')
@@ -133,16 +136,26 @@ pygame.time.set_timer(middle_enemy_interval, int(5*1000))
 big_enemy_interval = USEREVENT+3
 pygame.time.set_timer(big_enemy_interval, int(30*1000))
 ship_born_protect = USEREVENT+4
+pygame.time.set_timer(ship_born_protect, 3*1000)
+# every 30s generate one bulletAmmo supply
+bulletAmmo_interval = USEREVENT+5
+pygame.time.set_timer(bulletAmmo_interval, 30*1000)
+# the duration of bulletAmmo supply
+bulletAmmo_duration = USEREVENT+6
+pygame.time.set_timer(bulletAmmo_duration, 10*1000)
+bombAmmo_interval = USEREVENT+7
+pygame.time.set_timer(bombAmmo_interval, 1*1000)
 
-
-
+#pygame.mixer.music.play(-1)
+i=1
 while gameStatus.game_active:
+    
     
     gf.check_events(game_start_button, game_score_button, game_setting_button,
                     game_over_button, ship, gameStatus, settings, screen, 
-                    bullets,small_enemies, middle_enemies, big_enemies, 
-                    bullet_interval, small_enemy_interval, 
-                    middle_enemy_interval, big_enemy_interval,
+                    bullets,small_enemies, middle_enemies, big_enemies, bulletAmmos, bombAmmos,
+                    bullet_interval, bulletAmmo_interval, bombAmmo_interval, small_enemy_interval, 
+                    middle_enemy_interval, big_enemy_interval, bulletAmmo_duration,
                     ship_born_protect, bullet_sound)
      
     #screen.fill(settings.screen_background_color)
@@ -163,11 +176,22 @@ while gameStatus.game_active:
     
     if gameStatus.game_start_flag:
         
+        
+        
         if gameStatus.start_animation_flag:
             gf.load_start_animation(loading_pos, loading1_width, 
                                     loadig1_height, game_loadings, 
                                     settings, gameStatus, screen,
                                     background)
+        """    
+        while i<=1:
+            pygame.mixer.music.play(-1)
+            i += 1
+        """    
+        while i<=1:
+            game_music.play(-1)
+            i += 1    
+        #    
         #此处写入滚动地图代码
         screen.fill(settings.screen_background_color)
         gameMap1.map_update()
@@ -182,10 +206,13 @@ while gameStatus.game_active:
 
         
         gf.update_bullets(bullets, small_enemies, middle_enemies,
-                          big_enemies)
+                          big_enemies, settings)
         gf.update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay, enemy1_down_sound, enemy2_down_sound, enemy3_down_sound)
-        gf.update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect, me_down_sound)
+        gf.update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect, bulletAmmo_duration, me_down_sound, get_bullet_sound, bulletAmmos)
         gf.check_gameover(screen, gameStatus, background)
+        gf.update_bulletAmmos(bulletAmmos)
+        gf.update_bombAmmos(bombAmmos)
+        gf.show_score(screen, settings, score_font)
         
         delay -= 1
         
@@ -195,5 +222,5 @@ while gameStatus.game_active:
     pygame.display.update()
     #pygame.display.flip()
     time_passed = clock.tick(60)
-    game_music.play()
+    
     

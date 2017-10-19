@@ -45,7 +45,7 @@ class Ship():
         self.moving_up = False
         self.moving_down = False
         self.active = True
-        self.born = False
+        self.born = True
         # set mask
         self.mask = pygame.mask.from_surface(self.image)
         

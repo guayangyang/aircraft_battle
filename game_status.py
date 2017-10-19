@@ -15,3 +15,4 @@ class GameStatus():
         self.game_setting_flag = False
         self.game_over_flag = False
         self.start_animation_flag = True
+        self.isBulletAmmo = False
