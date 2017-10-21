@@ -16,6 +16,7 @@ from button import Button
 from game_status import GameStatus
 from game_map import GameMap
 from ship import Ship
+from score_board import ScoreBoard
 #from bullet import Bullet1
 from pygame.sprite import Group
 from pygame.locals import *
@@ -37,6 +38,8 @@ gameMap1 = GameMap(0, 0, settings, screen)
 gameMap2 = GameMap(0, -settings.screen_height, settings, screen)
 # buip an ship
 ship = Ship(settings, screen)
+# build a scoreboard
+scoreBoard = ScoreBoard(settings, screen, gameStatus)
 # build an bullet
 bullets = Group()
 bulletAmmos = Group()
@@ -206,13 +209,13 @@ while gameStatus.game_active:
 
         
         gf.update_bullets(bullets, small_enemies, middle_enemies,
-                          big_enemies, settings)
+                          big_enemies, settings, gameStatus, scoreBoard)
         gf.update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay, enemy1_down_sound, enemy2_down_sound, enemy3_down_sound)
         gf.update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect, bulletAmmo_duration, me_down_sound, get_bullet_sound, bulletAmmos)
         gf.check_gameover(screen, gameStatus, background)
         gf.update_bulletAmmos(bulletAmmos)
         gf.update_bombAmmos(bombAmmos)
-        gf.show_score(screen, settings, score_font)
+        gf.show_scoreBoard(scoreBoard)
         
         delay -= 1
         

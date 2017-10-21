@@ -104,7 +104,7 @@ def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadi
     screen.set_clip(0, 0, settings.screen_width, settings.screen_height)   
                   
 # update bullets' location and draw them, check if the bullet shots the enemy    
-def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings):
+def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings, gameStatus, scoreBoard):
     for bullet in bullets:
         if bullet.active:
             bullet.update_bullet_pos()
@@ -119,7 +119,8 @@ def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings
                     enemy.hit_point -= 1
                     if enemy.hit_point == 0:
                         enemy.active = False
-                        settings.score += settings.smallEnemy_score
+                        gameStatus.score += settings.smallEnemy_score
+                        scoreBoard.prep_score() 
             # check the bullet sprite shots the small_enemies sprites
             middle_enemy_hit = pygame.sprite.spritecollide(bullet, middle_enemies, False, pygame.sprite.collide_mask)        
             if middle_enemy_hit:
@@ -130,7 +131,8 @@ def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings
                     enemy.hit_point -= 1
                     if enemy.hit_point == 0:
                         enemy.active = False
-                        settings.score += settings.middleEnemy_score
+                        gameStatus.score += settings.middleEnemy_score
+                        scoreBoard.prep_score() 
             big_enemy_hit = pygame.sprite.spritecollide(bullet, big_enemies, False, pygame.sprite.collide_mask)        
             if big_enemy_hit:
                 # when hitting, remove the bullet sprite
@@ -140,7 +142,8 @@ def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings
                     enemy.hit_point -= 1
                     if enemy.hit_point == 0:
                         enemy.active = False
-                        settings.score += settings.bigEnemy_score
+                        gameStatus.score += settings.bigEnemy_score
+                        scoreBoard.prep_score() 
     # remove dispeared bullets                
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
@@ -253,9 +256,9 @@ def check_bulletAmmo(ship, gameStatus, bulletAmmos, get_bullet_sound, bulletAmmo
         for bulletAmmo in bulletAmmo_hit:
             bulletAmmos.remove(bulletAmmo)
         
-def show_score(screen, settings, score_font):
-    score_text=score_font.render("Score : %s"% str(settings.score),True,(0,0,0))
-    screen.blit(score_text,(10,5))
+def show_scoreBoard(scoreBoard):
+    scoreBoard.show_score()
+    
             
 
                 

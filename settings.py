@@ -33,8 +33,6 @@ class Settings():
         self.bomb_ammo_speed = 5
         
         #score
-        self.score = 0
-        self.high_score = 0
         self.smallEnemy_score = 10
         self.middleEnemy_score = 50
         self.bigEnemy_score = 500

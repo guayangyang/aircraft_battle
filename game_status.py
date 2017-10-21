@@ -16,3 +16,8 @@ class GameStatus():
         self.game_over_flag = False
         self.start_animation_flag = True
         self.isBulletAmmo = False
+        
+        self.score = 0
+        self.high_score = 0
+        self.level = 1
+        self.ships_left = 3
