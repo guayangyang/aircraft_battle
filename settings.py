@@ -17,7 +17,7 @@ class Settings():
         
         # ship setting
         self.ship_speed = 8
-        self.ship_lives = 3
+        #self.ship_lives = 3
         
         # bullet1 setting
         self.bullet1_speed = 10

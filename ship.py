@@ -6,24 +6,19 @@ Created on Tue Sep 26 23:13:38 2017
 """
 
 import pygame
-#from pygame.sprite import Sprite
+from pygame.sprite import Sprite
 
-class Ship():
+class Ship(Sprite):
 
     def __init__(self, settings, screen):
         """Initialize the ship, and set its starting position"""
-        #super().__init__()
+        super().__init__()
         self.screen = screen
         self.settings = settings
-        self.lives = settings.ship_lives
 
         # Load the ship image, and get its rect.
-        self.image = pygame.image.load('Resources/UI/ship.png')
-        self.image_width, self.image_height = self.image.get_size()
-        self.ship = pygame.transform.smoothscale(self.image, 
-                                                 (int(self.image_width//1), 
-                                                  int(self.image_height//1)))
-        self.rect = self.ship.get_rect()
+        self.image = pygame.image.load('Resources/UI/ship.png').convert_alpha()
+        self.rect = self.image.get_rect()
         self.screen_rect = self.screen.get_rect()
         
         # load the explosion image group
@@ -84,4 +79,12 @@ class Ship():
         self.rect.y = self.pos_y
     def draw_ship(self):
         """Draw the ship at its current location."""
-        self.screen.blit(self.ship, self.rect)
+        self.screen.blit(self.image, self.rect)
+        
+    def transform_ship(self):
+        self.image_width, self.image_height = self.image.get_size()
+        self.image = pygame.transform.smoothscale(self.image, 
+                                                 (int(self.image_width//1.8), 
+                                                  int(self.image_height//1.8)))
+        self.image_width, self.image_height = self.image.get_size()
+        

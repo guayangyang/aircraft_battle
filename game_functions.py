@@ -14,9 +14,10 @@ import time
 # check events
 def check_events(game_start_button, game_score_button, game_setting_button,
                  game_over_button, ship, gameStatus, settings, screen, bullets,
-                 small_enemies, middle_enemies, big_enemies, bulletAmmos, bombAmmos, bullet_interval, bulletAmmo_interval, bombAmmo_interval,
-                 small_enemy_interval, middle_enemy_interval,
-                 big_enemy_interval, bulletAmmo_duration, ship_born_protect, bullet_sound):
+                 small_enemies, middle_enemies, bulletAmmos, 
+                 bombAmmos, bullet_interval, bulletAmmo_interval, bombAmmo_interval,
+                 small_enemy_interval, middle_enemy_interval,big_enemy_interval, 
+                 bulletAmmo_duration, ship_born_protect, bullet_sound, scoreBoard, boss):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -54,10 +55,12 @@ def check_events(game_start_button, game_score_button, game_setting_button,
         elif event.type == middle_enemy_interval and gameStatus.game_start_flag:
             middle_enemy = MiddleEnemy(settings, screen)
             middle_enemies.add(middle_enemy)
-        elif event.type == big_enemy_interval and gameStatus.game_start_flag:
-            if len(big_enemies) < 1:
-                big_enemy = BigEnemy(settings, screen)
-                big_enemies.add(big_enemy)
+        
+        #elif event.type == big_enemy_interval and gameStatus.game_start_flag:
+            #if len(big_enemies) < 1:
+                #big_enemy = BigEnemy(settings, screen)
+                #big_enemies.add(big_enemy)
+       
         elif event.type == ship_born_protect and gameStatus.game_start_flag:
             ship.born = False
             pygame.time.set_timer(ship_born_protect, 0)
@@ -70,6 +73,16 @@ def check_events(game_start_button, game_score_button, game_setting_button,
         elif event.type == bombAmmo_interval and gameStatus.game_start_flag:
             new_bombAmmo = BombAmmo(settings, screen)
             bombAmmos.add(new_bombAmmo)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and gameStatus.bombs_left > 0:
+                update_enemy_status(small_enemies, gameStatus, scoreBoard, settings.smallEnemy_score)
+                update_enemy_status(middle_enemies, gameStatus, scoreBoard, settings.middleEnemy_score)
+                update_enemy_status(boss, gameStatus, scoreBoard, settings.bigEnemy_score)
+                if gameStatus.bombs_left > 0:
+                    gameStatus.bombs_left -= 1
+                scoreBoard.prep_bombs()
+                
+                
      
     # check keyboard state
     check_keys_states(ship, gameStatus)
@@ -90,7 +103,7 @@ def check_keys_states(ship, gameStatus):
         ship.moving_left = True
     if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         ship.moving_right = True
-    
+   
 #def load__start_animation():
 def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadings, settings, gameStatus, screen, background):
     screen.set_clip(loading_pos[0], loading_pos[1], loading1_width, loadig1_height)
@@ -101,10 +114,12 @@ def load_start_animation(loading_pos, loading1_width, loadig1_height, game_loadi
             pygame.display.update()
             time.sleep(0.1)
     gameStatus.start_animation_flag = False
-    screen.set_clip(0, 0, settings.screen_width, settings.screen_height)   
+    screen.set_clip(0, 0, settings.screen_width, settings.screen_height)
+    
+    
                   
 # update bullets' location and draw them, check if the bullet shots the enemy    
-def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings, gameStatus, scoreBoard):
+def update_bullets(bullets, small_enemies, middle_enemies, boss, settings, gameStatus, scoreBoard):
     for bullet in bullets:
         if bullet.active:
             bullet.update_bullet_pos()
@@ -114,47 +129,40 @@ def update_bullets(bullets, small_enemies, middle_enemies, big_enemies, settings
             if small_enemy_hit:
                 # when hitting, remove the bullet sprite
                 bullets.remove(bullet)
-                for enemy in small_enemy_hit:
-                    #enemy.hit = True
-                    enemy.hit_point -= 1
-                    if enemy.hit_point == 0:
-                        enemy.active = False
-                        gameStatus.score += settings.smallEnemy_score
-                        scoreBoard.prep_score() 
+                update_enemy_status(small_enemy_hit, gameStatus, scoreBoard, settings.smallEnemy_score)
             # check the bullet sprite shots the small_enemies sprites
             middle_enemy_hit = pygame.sprite.spritecollide(bullet, middle_enemies, False, pygame.sprite.collide_mask)        
             if middle_enemy_hit:
                 # when hitting, remove the bullet sprite
                 bullets.remove(bullet)
-                for enemy in middle_enemy_hit:
-                    enemy.hit = True
-                    enemy.hit_point -= 1
-                    if enemy.hit_point == 0:
-                        enemy.active = False
-                        gameStatus.score += settings.middleEnemy_score
-                        scoreBoard.prep_score() 
-            big_enemy_hit = pygame.sprite.spritecollide(bullet, big_enemies, False, pygame.sprite.collide_mask)        
+                update_enemy_status(middle_enemy_hit, gameStatus, scoreBoard, settings.middleEnemy_score)
+            big_enemy_hit = pygame.sprite.spritecollide(bullet, boss, False, pygame.sprite.collide_mask)        
             if big_enemy_hit:
                 # when hitting, remove the bullet sprite
                 bullets.remove(bullet)
-                for enemy in big_enemy_hit:
-                    enemy.hit = True
-                    enemy.hit_point -= 1
-                    if enemy.hit_point == 0:
-                        enemy.active = False
-                        gameStatus.score += settings.bigEnemy_score
-                        scoreBoard.prep_score() 
+                update_enemy_status(big_enemy_hit, gameStatus, scoreBoard, settings.bigEnemy_score)
     # remove dispeared bullets                
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+            
+def update_enemy_status(enemy_hit, gameStatus, scoreBoard, enemy_score):
+    for enemy in enemy_hit:
+        enemy.hit = True
+        enemy.hit_point -= 1
+        if enemy.hit_point == 0:
+            enemy.active = False
+            gameStatus.score += enemy_score
+            scoreBoard.prep_score()    
+            
+            
 
 
 
-def update_all_enemies(small_enemies, middle_enemies, big_enemies, screen, delay, enemy1_down_sound, enemy2_down_sound, enemy3_down_sound):
+def update_all_enemies(small_enemies, middle_enemies, boss, screen, delay, enemy1_down_sound, enemy2_down_sound, enemy3_down_sound):
     check_enemies(small_enemies, screen, delay, 5, enemy1_down_sound)
     check_enemies(middle_enemies, screen, delay, 5, enemy2_down_sound)
-    check_enemies(big_enemies, screen, delay, 15, enemy3_down_sound)
+    check_enemies(boss, screen, delay, 15, enemy3_down_sound)
     """
     forbid_enemies_overlap(small_enemies, small_enemies)
     forbid_enemies_overlap(middle_enemies, middle_enemies)
@@ -184,6 +192,8 @@ def check_enemies(enemies, screen, delay, num_frames, enemy_down_sound):
                 # when the crash animation done, remove the enemy sprite
                 if enemy.image_group_index == 0:
                     enemies.remove(enemy)
+                    
+    
 
 """                            
 # fix enemies overlap in the screen                            
@@ -196,14 +206,18 @@ def forbid_enemies_overlap(enemygroup1, enemygroup2):
             #enemy2.move_direc *= -1                    
 """ 
 
-def update_ship(ship, small_enemies, middle_enemies, big_enemies, gameStatus, delay, screen, ship_born_protect, bulletAmmo_duration, me_down_sound, get_bullet_sound, bulletAmmos):
-    check_ship(ship, small_enemies, gameStatus, delay, screen, ship_born_protect, me_down_sound)
-    check_ship(ship, middle_enemies, gameStatus, delay, screen, ship_born_protect, False)
-    check_ship(ship, big_enemies, gameStatus, delay, screen, ship_born_protect, False)
+def update_ship(ship, small_enemies, middle_enemies, boss, gameStatus, 
+                delay, screen, ship_born_protect, bulletAmmo_duration, 
+                me_down_sound, get_bullet_sound, bulletAmmos, scoreBoard, 
+                bombAmmos, get_bomb_sound):
+    check_ship(ship, small_enemies, gameStatus, delay, screen, ship_born_protect, me_down_sound, scoreBoard)
+    check_ship(ship, middle_enemies, gameStatus, delay, screen, ship_born_protect, scoreBoard, False)
+    check_ship(ship, boss, gameStatus, delay, screen, ship_born_protect, scoreBoard, False)
     check_bulletAmmo(ship, gameStatus, bulletAmmos, get_bullet_sound, bulletAmmo_duration)
+    check_bombAmmo(ship, gameStatus, bombAmmos, get_bomb_sound, scoreBoard)
 
     
-def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, me_down_sound, is_small_enemy = True):
+def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, me_down_sound, scoreBoard, is_small_enemy = True):
     ship_hit = pygame.sprite.spritecollide(ship, enemygroup, False, pygame.sprite.collide_mask)
     if ship_hit and not ship.born:
         ship.active = False
@@ -228,13 +242,15 @@ def check_ship(ship, enemygroup, gameStatus, delay, screen, ship_born_protect, m
             ship.image_group_index = (ship.image_group_index+1) % len(ship.image_group) 
             # when the crash animation done, remove the enemy sprite
             if ship.image_group_index == 0:
-                ship.lives -= 1
+                gameStatus.ships_left -= 1
+                scoreBoard.prep_ships()
+                
                 ship.init_ship()
                 pygame.time.set_timer(ship_born_protect, 3*1000)
                 gameStatus.isBulletAmmo = False
 
                 #del small_enemy_hit 
-    if ship.lives == 0:
+    if gameStatus.ships_left == 0:
         gameStatus.game_active = False
 
 def update_bulletAmmos(bulletAmmos):
@@ -255,9 +271,42 @@ def check_bulletAmmo(ship, gameStatus, bulletAmmos, get_bullet_sound, bulletAmmo
         pygame.time.set_timer(bulletAmmo_duration, 10*1000)
         for bulletAmmo in bulletAmmo_hit:
             bulletAmmos.remove(bulletAmmo)
+
+def check_bombAmmo(ship, gameStatus, bombAmmos, get_bomb_sound, scoreBoard):
+    bombAmmo_hit = pygame.sprite.spritecollide(ship, bombAmmos, False, pygame.sprite.collide_mask)       
+    if bombAmmo_hit:
+        get_bomb_sound.play()
+        if gameStatus.bombs_left < 5:
+            gameStatus.bombs_left += 1
+        scoreBoard.prep_bombs()
+        for bombAmmo in bombAmmo_hit:
+            bombAmmos.remove(bombAmmo)
+
         
 def show_scoreBoard(scoreBoard):
     scoreBoard.show_score()
+    
+
+def update_level(gameStatus, scoreBoard, screen, settings, bullet_interval, small_enemy_interval, middle_enemy_interval, gameMap1, gameMap2, boss):
+    #此处考虑大boss死掉才升级
+    if gameStatus.score >= 100 * (gameStatus.level ** 1.5):
+        if len(boss) < 1:
+                big_enemy = BigEnemy(settings, screen)
+                boss.add(big_enemy)        
+        for bigEnemy in boss:
+            if not bigEnemy.active:
+                bigEnemy.active = True
+                gameStatus.level += 1
+                scoreBoard.prep_level()
+                #gameMap1.rolling_speed += 1
+                #gameMap2.rolling_speed += 1
+                settings.smallEnemy_speed += 1
+                settings.middleEnemy_speed += 1
+                pygame.time.set_timer(bullet_interval, int(0.2*1000-gameStatus.level*5)) 
+                pygame.time.set_timer(small_enemy_interval, int(1*1000-gameStatus.level*25))
+                pygame.time.set_timer(middle_enemy_interval, int(5*1000-gameStatus.level*125))
+                
+    
     
             
 

@@ -21,3 +21,4 @@ class GameStatus():
         self.high_score = 0
         self.level = 1
         self.ships_left = 3
+        self.bombs_left = 3

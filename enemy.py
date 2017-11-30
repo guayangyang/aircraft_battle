@@ -39,6 +39,8 @@ class SmallEnemy(Enemy):
         self.image_group.append(pygame.image.load('Resources/UI/enemy1_down2.png').convert_alpha())
         self.image_group.append(pygame.image.load('Resources/UI/enemy1_down3.png').convert_alpha())
         self.image_group.append(pygame.image.load('Resources/UI/enemy1_down4.png').convert_alpha())
+        
+        self.image_hit = pygame.image.load('Resources/UI/enemy1.png').convert_alpha()
         # initialize the enemy's position
         self.init_enemy()
         # Store a decimal value for the position.
@@ -139,6 +141,7 @@ class BigEnemy(Enemy):
         self.mask=pygame.mask.from_surface(self.image)
         # set hit point
         self.hit_point = 100
+        #self.active = False
 
     # update enemy position
     def update_enemy_pos(self, screen):
@@ -159,6 +162,6 @@ class BigEnemy(Enemy):
         
     # initialize the enemy's position       
     def init_enemy(self):
-        self.rect.x = randint(100, 1200)
+        self.rect.x = randint(500, 800)
         self.rect.y = randint(-201, -200)
     
